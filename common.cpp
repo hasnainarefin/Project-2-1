@@ -58,7 +58,7 @@ void clearScreen() {
 // busy-wait delay (used by the animation)
 void delayMs(int ms) {
     clock_t start = clock();
-    while ((double)(clock() - start) < ms / 5000.0 * CLOCKS_PER_SEC) {}
+    while ((double)(clock() - start) < ms / 10000.0 * CLOCKS_PER_SEC) {}
 }
 
 // print one coloured line
