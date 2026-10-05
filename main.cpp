@@ -1,6 +1,3 @@
-// FILE: main.cpp | JOB: start the program: build map, load saved data, add starting data, run, save
-// Build (only this one file is compiled; it pulls in the others with #include):
-//   g++ -std=c++11 -O2 main.cpp -o ambulance_system
 #include "app_menu.cpp"
 
 // save files (plain text, one record per line)

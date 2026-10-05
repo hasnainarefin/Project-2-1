@@ -1,11 +1,7 @@
-// FILE: sort_search.cpp | JOB: sorting + searching used for ranking and for finding a location by name
-// DSA: Selection sort, Insertion sort, Merge sort, Linear search, Binary search, Binary Search Tree (BST)
+
 #pragma once
 #include "city_graph.cpp"
 
-// ---------- sorting: idx[] and dist[] are parallel arrays, sorted by dist (small -> big) ----------
-
-// Selection sort: find the smallest remaining value and swap it forward
 void selectionSortByDistance(int idx[], int dist[], int count) {
     for (int i = 0; i < count - 1; i++) {
         int minPos = i;
