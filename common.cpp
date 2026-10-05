@@ -84,7 +84,7 @@ void clearScreen()
 void delayMs(int ms)
 {
     clock_t start = clock();
-    while ((double)(clock() - start) < ms / 10000.0 * CLOCKS_PER_SEC)
+    while ((double)(clock() - start) < ms / 7000.0 * CLOCKS_PER_SEC)
     {
     }
 }
