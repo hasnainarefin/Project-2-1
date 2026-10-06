@@ -6,9 +6,7 @@ struct LocationInfo
 {
     const char *name;
     int row, col;
-}; // row/col = position on the terminal map
-
-// 40 Khulna locations; array index = node id (map positions are schematic, not GPS)
+};
 static const LocationInfo LOCATIONS[] = {
     {"Sonadanga", 13, 3},         // 0
     {"Fulbarigate", 19, 12},      // 1
@@ -52,7 +50,6 @@ static const LocationInfo LOCATIONS[] = {
     {"Batiaghata", 17, 75},       // 39
 };
 
-// roads: {from, to, distance in metres}
 static const int ROADS[][3] = {
     {0, 1, 900},
     {0, 7, 500},
@@ -140,13 +137,11 @@ static const int ROADS[][3] = {
 
 static char nodeTagArr[MAX_NODES];
 static int nodeCount = 0;
-static int roadDist[MAX_NODES][MAX_NODES]; // adjacency matrix: roadDist[u][v] = metres, -1 = no road
+static int roadDist[MAX_NODES][MAX_NODES];
 static bool hospitalFlag[MAX_NODES];
 
-// A-Z then a-n label shown on the map
 static char makeTag(int id) { return id < 26 ? (char)('A' + id) : (char)('a' + id - 26); }
 
-// Graph: add one undirected road (store the distance in both directions of the matrix)
 static void addRoad(int u, int v, int d)
 {
     if (roadDist[u][v] >= 0)
@@ -154,7 +149,6 @@ static void addRoad(int u, int v, int d)
     roadDist[u][v] = roadDist[v][u] = d;
 }
 
-// build the graph from the two tables above
 void initCityMap()
 {
     nodeCount = sizeof(LOCATIONS) / sizeof(LOCATIONS[0]);
@@ -184,7 +178,6 @@ void markHospitalNode(int id)
 }
 bool hasRoad(int u, int v) { return roadDist[u][v] >= 0; }
 
-// Graph (matrix): scan row u to collect the neighbours of u (used by Dijkstra, BFS, DFS)
 void copyNeighbors(int u, int toArr[], int wArr[], int &n)
 {
     n = 0;
@@ -197,7 +190,6 @@ void copyNeighbors(int u, int toArr[], int wArr[], int &n)
         }
 }
 
-// Graph: degree = how many roads touch a node (count the filled cells of row u)
 int getDegree(int u)
 {
     int n = 0;
@@ -207,7 +199,6 @@ int getDegree(int u)
     return n;
 }
 
-// Array: give other files a copy of all location names (ids[i] == i)
 void fillLocationNames(string names[], int ids[], int &count)
 {
     count = nodeCount;
@@ -218,7 +209,6 @@ void fillLocationNames(string names[], int ids[], int &count)
     }
 }
 
-// Dijkstra: shortest distance from source to every node, O(V^2), no heap
 void dijkstraFrom(int source, int dist[], int prevNode[])
 {
     bool done[MAX_NODES];
@@ -233,7 +223,6 @@ void dijkstraFrom(int source, int dist[], int prevNode[])
     dist[source] = 0;
     for (int round = 0; round < nodeCount; round++)
     {
-        // pick the unfinished node with the smallest distance
         int u = -1, best = INF_DIST + 1;
         for (int i = 0; i < nodeCount; i++)
             if (!done[i] && dist[i] < best)
@@ -244,7 +233,6 @@ void dijkstraFrom(int source, int dist[], int prevNode[])
         if (u == -1)
             break;
         done[u] = true;
-        // relax every road leaving u
         int to[MAX_NODES], w[MAX_NODES], n = 0;
         copyNeighbors(u, to, w, n);
         for (int k = 0; k < n; k++)
@@ -256,7 +244,6 @@ void dijkstraFrom(int source, int dist[], int prevNode[])
     }
 }
 
-// Array: follow prevNode backwards from target, then reverse into pathOut (returns path length)
 int buildPath(int prevNode[], int target, int pathOut[])
 {
     int tmp[MAX_PATH_LEN], count = 0;
@@ -267,7 +254,6 @@ int buildPath(int prevNode[], int target, int pathOut[])
     return count;
 }
 
-// print a route as text
 void printPathText(int path[], int count, int totalDist)
 {
     info("Shortest route (Dijkstra):");
@@ -283,7 +269,6 @@ void printPathText(int path[], int count, int totalDist)
     warn("Total distance: " + toStr(totalDist) + " m");
 }
 
-// Graph: list every location with its degree (aligned columns)
 void listLocations()
 {
     heading("Khulna Locations");
@@ -296,7 +281,6 @@ void listLocations()
     }
 }
 
-// Graph: print roads by scanning the adjacency MATRIX row by row
 void printRoadsMatrix()
 {
     heading("Road Network (adjacency matrix)");

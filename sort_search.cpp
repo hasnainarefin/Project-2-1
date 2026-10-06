@@ -13,7 +13,7 @@ void selectionSortByDistance(int idx[], int dist[], int count) {
     }
 }
 
-// Insertion sort: take each item and slide it left into its place
+
 void insertionSortByDistance(int idx[], int dist[], int count) {
     for (int i = 1; i < count; i++) {
         int keyD = dist[i], keyI = idx[i], j = i - 1;
@@ -22,7 +22,7 @@ void insertionSortByDistance(int idx[], int dist[], int count) {
     }
 }
 
-// Merge sort (divide and conquer) on idx/dist: merge two sorted halves
+
 static void mergeHalves(int idx[], int dist[], int lo, int mid, int hi, int tIdx[], int tDist[]) {
     int i = lo, j = mid + 1, k = lo;
     while (i <= mid && j <= hi) {
@@ -46,7 +46,7 @@ void mergeSortByDistance(int idx[], int dist[], int count) {
     mergeSortRec(idx, dist, 0, count - 1, tIdx, tDist);
 }
 
-// Merge sort on names (needed before binary search)
+
 static void mergeNames(string a[], int lo, int mid, int hi, string tmp[]) {
     int i = lo, j = mid + 1, k = lo;
     while (i <= mid && j <= hi) tmp[k++] = (a[i] <= a[j]) ? a[i++] : a[j++];
@@ -66,15 +66,15 @@ void mergeSortNames(string a[], int count) {
     mergeSortNamesRec(a, 0, count - 1, tmp);
 }
 
-// ---------- searching on a name array ----------
 
-// Linear search: check every item one by one, O(n)
+
+
 int linearSearchNames(const string a[], int count, const string& target) {
     for (int i = 0; i < count; i++) if (a[i] == target) return i;
     return -1;
 }
 
-// Binary search: array must be sorted; halve the range each step, O(log n)
+
 int binarySearchNames(const string a[], int count, const string& target) {
     int lo = 0, hi = count - 1;
     while (lo <= hi) {
@@ -85,11 +85,11 @@ int binarySearchNames(const string a[], int count, const string& target) {
     return -1;
 }
 
-// ---------- Binary Search Tree: location name -> node id ----------
+
 struct BstNode { string name; int nodeId; BstNode* left; BstNode* right; };
 static BstNode* bstRoot = NULL;
 
-// BST insert: smaller names go left, bigger go right
+
 static BstNode* bstInsertRec(BstNode* n, const string& name, int id) {
     if (n == NULL) { return new BstNode{name, id, NULL, NULL}; }
     if (name < n->name) n->left = bstInsertRec(n->left, name, id);
@@ -97,7 +97,7 @@ static BstNode* bstInsertRec(BstNode* n, const string& name, int id) {
     return n;
 }
 
-// BST search: go left or right until found, O(height)
+
 static int bstFindRec(BstNode* n, const string& name) {
     if (n == NULL) return -1;
     if (name == n->name) return n->nodeId;
@@ -105,7 +105,7 @@ static int bstFindRec(BstNode* n, const string& name) {
 }
 int bstFind(const string& name) { return bstFindRec(bstRoot, name); }
 
-// build the tree from all map locations
+
 void bstBuild() {
     string names[MAX_NODES]; int ids[MAX_NODES], count = 0;
     fillLocationNames(names, ids, count);

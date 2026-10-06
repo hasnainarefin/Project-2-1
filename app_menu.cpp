@@ -1,11 +1,8 @@
-// FILE: app_menu.cpp | JOB: all screens - login, user dashboard, admin dashboard (only calls the other files)
-// DSA: none of its own; it connects every structure to a menu option
 #pragma once
 #include "dispatch.cpp"
 #include "hash_tables.cpp"
 #include "requests.cpp"
 
-// show map + location list, then ask for a node id (-1 if invalid)
 static int askLocationNode(const string& prompt) {
     showGridMap();
     listLocations();
@@ -14,11 +11,10 @@ static int askLocationNode(const string& prompt) {
     return node;
 }
 
-// Search a location 3 ways: linear (array), binary (sorted array), BST
 static void searchLocationFlow() {
     showScreen("Search Location");
     menuItem("1", "Linear search by name");
-    menuItem("2", "Binary search by name (merge sort first)");
+    menuItem("2", "Binary search by name");
     menuItem("3", "BST search by name");
     int c = readInt("Choice: ");
     string name = readLine("Location name (exact, e.g. KUET): ");
@@ -29,7 +25,7 @@ static void searchLocationFlow() {
         found = linearSearchNames(names, count, name);
     } else if (c == 2) {
         mergeSortNames(names, count);
-        if (binarySearchNames(names, count, name) != -1) found = bstFind(name);   // sorted order loses ids, so read the id from the BST
+        if (binarySearchNames(names, count, name) != -1) found = bstFind(name);
     } else {
         found = bstFind(name);
     }
@@ -38,7 +34,6 @@ static void searchLocationFlow() {
     waitEnter();
 }
 
-// ---------------- ADMIN ----------------
 static void manageFleetMenu() {
     while (true) {
         showScreen("Admin -> Manage Fleet");
@@ -125,14 +120,14 @@ static void cityAnalyticsMenu() {
     while (true) {
         showScreen("Admin -> City Analytics");
         menuItem("1", "City map");
-        menuItem("2", "Roads (adjacency matrix)");
+        menuItem("2", "Roads");
         menuItem("3", "Zone tree");
-        menuItem("4", "Trips sorted by distance (merge sort)");
+        menuItem("4", "Trips sorted by distance");
         menuItem("0", "Back");
         int c = readInt("Choice: ");
         if (c == 0) break;
         if (c == 1) showGridMap();
-        else if (c == 2) { printRoadsMatrix(); cout << "\nConnected pieces in the city (DFS): " << countComponents() << "\n"; }
+        else if (c == 2) { printRoadsMatrix(); cout << "\nConnected pieces in the city: " << countComponents() << "\n"; }
         else if (c == 3) printZoneTree();
         else if (c == 4) showTripsSortedByDistance();
         waitEnter();
@@ -145,10 +140,10 @@ static void adminDashboard() {
         menuItem("1", "Manage Ambulance Fleet");
         menuItem("2", "Manage Hospitals");
         menuItem("3", "Manage Login Accounts");
-        menuItem("4", "View Requests (queue + heap)");
-        menuItem("5", "View All Trips (linked list)");
-        menuItem("6", "View Action History (stack)");
-        menuItem("7", "City Analytics (map, roads, zones, trips)");
+        menuItem("4", "View Requests");
+        menuItem("5", "View All Trips");
+        menuItem("6", "View Action History");
+        menuItem("7", "City Analytics");
         menuItem("0", "Logout");
         int c = readInt("Choice: ");
         if (c == 0) break;
@@ -163,11 +158,9 @@ static void adminDashboard() {
     }
 }
 
-// ---------------- USER ----------------
-// Booking in 3 steps: (1) my info + pickup, (2) destination hospital, (3) normal or emergency
 static void requestAmbulanceFlow(UserAccount* acc) {
     showScreen("Request Ambulance - Step 1: Your Information");
-    PatientRecord* p = lookupPatient(acc->patientCode);   // hash table lookup
+    PatientRecord* p = lookupPatient(acc->patientCode);
     string name, phone;
     int node;
     if (p != NULL) {
@@ -184,7 +177,7 @@ static void requestAmbulanceFlow(UserAccount* acc) {
         phone = readLine("Your contact number: ");
         node = askLocationNode("Your current location node: ");
         if (node < 0) { waitEnter(); return; }
-        string newCode = registerPatient(name, phone, node);   // hash table insert
+        string newCode = registerPatient(name, phone, node);
         setAccountPatientCode(acc->username, newCode);
         acc->patientCode = newCode;
         good("Registered as patient " + newCode);
@@ -193,7 +186,7 @@ static void requestAmbulanceFlow(UserAccount* acc) {
     waitEnter();
 
     showScreen("Request Ambulance - Step 2: Destination Hospital");
-    printReachableHospitals(node);     // BFS
+    printReachableHospitals(node);
     listHospitals();
     string hospCode = readLine("\nHospital ID you want to go to: ");
     int hi = findHospital(hospCode);
@@ -218,9 +211,8 @@ static void requestAmbulanceFlow(UserAccount* acc) {
     waitEnter();
 }
 
-// Dijkstra + Selection sort: hospitals near me, nearest first
 static void showNearestHospitalsFlow(UserAccount* acc) {
-    showScreen("Nearby Hospitals (Dijkstra + selection sort)");
+    showScreen("Nearby Hospitals");
     PatientRecord* p = lookupPatient(acc->patientCode);
     int node = (p != NULL) ? p->atNode : askLocationNode("Your location node: ");
     if (node < 0) { waitEnter(); return; }
@@ -240,7 +232,7 @@ static void userDashboard(UserAccount* acc) {
         menuItem("2", "My Trip History");
         menuItem("3", "Nearest Hospitals");
         menuItem("4", "View City Map");
-        menuItem("5", "Hospitals reachable from me (BFS)");
+        menuItem("5", "Hospitals reachable from me");
         menuItem("6", "Search a location");
         menuItem("0", "Logout");
         int c = readInt("Choice: ");
@@ -259,8 +251,7 @@ static void userDashboard(UserAccount* acc) {
     }
 }
 
-// ---------------- LOGIN ----------------
-// admin and user use separate login screens; a wrong role is rejected
+
 static UserAccount* doLogin(int requiredRole, const string& title) {
     showScreen(title);
     string u = readLine("Username: "), p = readLine("Password: ");
@@ -277,7 +268,7 @@ static UserAccount* doLogin(int requiredRole, const string& title) {
 
 void runApplication() {
     while (true) {
-        showScreen("SMART AMBULANCE MANAGEMENT SYSTEM  |  Khulna");
+        showScreen("KHULNA AMBULANCE ROUTING SYSTEM");
         menuItem("1", "User Login");
         menuItem("2", "User Signup");
         menuItem("3", "Admin Login");

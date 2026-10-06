@@ -1,9 +1,7 @@
-// FILE: traversal.cpp | JOB: visit the graph (BFS, DFS) and the district tree
-// DSA: BFS with array queue, DFS with array stack, connected components, Tree (child/sibling) with recursive preorder
 #pragma once
 #include "city_graph.cpp"
 
-// BFS: visit nodes level by level using an array QUEUE; hop[v] = number of roads from src (-1 = unreachable)
+
 void bfsFrom(int src, int parent[], int hop[], int order[], int& count) {
     bool seen[MAX_NODES];
     int q[MAX_NODES], front = 0, rear = 0;
@@ -12,25 +10,25 @@ void bfsFrom(int src, int parent[], int hop[], int order[], int& count) {
     if (!validNode(src)) return;
     seen[src] = true; hop[src] = 0; q[rear++] = src;
     while (front < rear) {
-        int u = q[front++];                      // dequeue
+        int u = q[front++];                      
         order[count++] = u;
         int to[MAX_NODES], w[MAX_NODES], n = 0;
         copyNeighbors(u, to, w, n);
         for (int k = 0; k < n; k++)
-            if (!seen[to[k]]) { seen[to[k]] = true; parent[to[k]] = u; hop[to[k]] = hop[u] + 1; q[rear++] = to[k]; }   // enqueue
+            if (!seen[to[k]]) { seen[to[k]] = true; parent[to[k]] = u; hop[to[k]] = hop[u] + 1; q[rear++] = to[k]; }   
     }
 }
 
-// DFS: go deep first using an array STACK (push/pop with a top index)
+
 void dfsFrom(int src, int order[], int& count) {
     bool visited[MAX_NODES];
     int st[MAX_NODES * 4], top = -1;
     count = 0;
     for (int i = 0; i < getNodeCount(); i++) visited[i] = false;
     if (!validNode(src)) return;
-    st[++top] = src;                             // push
+    st[++top] = src;                             
     while (top >= 0) {
-        int u = st[top--];                       // pop
+        int u = st[top--];                       
         if (visited[u]) continue;
         visited[u] = true;
         order[count++] = u;
@@ -40,7 +38,7 @@ void dfsFrom(int src, int order[], int& count) {
     }
 }
 
-// DFS from every unvisited node; each fresh start = one separate connected piece of the city
+
 int countComponents() {
     bool done[MAX_NODES];
     int comps = 0;
@@ -55,7 +53,7 @@ int countComponents() {
     return comps;
 }
 
-// ---------- Tree: KhulnaCity -> 5 zones; each zone keeps a list of node ids ----------
+
 struct ZoneNode { string name; int ids[16]; int idCount; ZoneNode* firstChild; ZoneNode* nextSibling; };
 static ZoneNode* zoneRoot = NULL;
 static int nodeToZone[MAX_NODES];
@@ -63,10 +61,10 @@ static const char* ZONE_NAMES[5] = {"North", "Central", "East", "West", "South"}
 
 static ZoneNode* makeZone(const string& name) { return new ZoneNode{name, {0}, 0, NULL, NULL}; }
 
-// attach a location to a zone (also remembers node -> zone number)
+
 static void zoneAdd(ZoneNode* z, int zoneNo, int nodeId) { z->ids[z->idCount++] = nodeId; nodeToZone[nodeId] = zoneNo; }
 
-// Tree: add child at the end of the parent's sibling chain
+
 static void zoneLink(ZoneNode* parent, ZoneNode* child) {
     if (parent->firstChild == NULL) { parent->firstChild = child; return; }
     ZoneNode* p = parent->firstChild;
@@ -74,7 +72,7 @@ static void zoneLink(ZoneNode* parent, ZoneNode* child) {
     p->nextSibling = child;
 }
 
-// which location belongs to which zone
+
 static const int ZONE_MEMBERS[5][11] = {
     {1, 2, 3, 4, 5, 6, 32, 38, 39, -1},
     {0, 7, 8, 9, 10, 11, 12, 13, 33, 35, 36},
@@ -93,7 +91,7 @@ void initZoneTree() {
     }
 }
 
-// Tree preorder DFS (recursion): print node, then children, then siblings
+
 static void zonePreorder(ZoneNode* z, int depth) {
     if (z == NULL) return;
     cout << string(depth * 4, ' ');

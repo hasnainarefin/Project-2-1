@@ -1,18 +1,18 @@
-// FILE: fleet_hospitals.cpp | JOB: store ambulances and hospitals, rank hospitals by road distance
-// DSA: Array of structs (add, search, delete by shifting), Dijkstra + Selection sort for ranking, BFS reachability
+
+
 #pragma once
 #include "city_graph.cpp"
 #include "sort_search.cpp"
 #include "traversal.cpp"
 
-// ================= AMBULANCES (array) =================
+
 static AmbulanceRecord fleet[MAX_AMBULANCES];
 static int fleetCount = 0, nextAmbNo = 1;
 
 int getFleetCount() { return fleetCount; }
 AmbulanceRecord& fleetAt(int i) { return fleet[i]; }
 
-// Array: append at the end
+
 string addAmbulance(const string& driver, const string& phone, int atNode) {
     if (fleetCount >= MAX_AMBULANCES) return "";
     AmbulanceRecord a = {makeCode("AMB", nextAmbNo++), driver, phone, atNode, ST_AVAILABLE, 0};
@@ -20,13 +20,13 @@ string addAmbulance(const string& driver, const string& phone, int atNode) {
     return a.code;
 }
 
-// Linear search by code
+
 int findAmbulance(const string& code) {
     for (int i = 0; i < fleetCount; i++) if (fleet[i].code == code) return i;
     return -1;
 }
 
-// Array: delete by shifting everything after it one place left
+
 bool removeAmbulance(const string& code) {
     int idx = findAmbulance(code);
     if (idx == -1) return false;
@@ -54,7 +54,7 @@ void listFleet() {
     }
 }
 
-// Dijkstra + Insertion sort: show all ambulances ordered by road distance to a node
+
 void rankAmbulancesTo(int node) {
     int dist[MAX_NODES], prev[MAX_NODES];
     dijkstraFrom(node, dist, prev);
@@ -85,14 +85,14 @@ void loadFleet(const string& file) {
     }
 }
 
-// ================= HOSPITALS (array) =================
+
 static HospitalRecord hospitals[MAX_HOSPITALS];
 static int hospitalCount = 0, nextHosNo = 1;
 
 int getHospitalCount() { return hospitalCount; }
 HospitalRecord& hospitalAt(int i) { return hospitals[i]; }
 
-// Array: append, and mark that map node green
+
 string addHospital(const string& title, int atNode, int beds, const string& specialty) {
     if (hospitalCount >= MAX_HOSPITALS) return "";
     HospitalRecord h = {makeCode("HOS", nextHosNo++), title, atNode, beds, specialty};
@@ -114,7 +114,7 @@ bool removeHospital(const string& code) {
     return true;
 }
 
-// one patient takes one bed
+
 bool bookBed(const string& code) {
     int i = findHospital(code);
     if (i == -1 || hospitals[i].beds <= 0) return false;
@@ -131,7 +131,7 @@ void listHospitals() {
     }
 }
 
-// Dijkstra + Selection sort: hospitals with a free bed, nearest first (specialty "" = any)
+
 int rankHospitalsByDistance(int source, const string& specialty, int resIdx[], int resDist[], int resPath[][MAX_PATH_LEN], int resLen[]) {
     int dist[MAX_NODES], prev[MAX_NODES], count = 0;
     dijkstraFrom(source, dist, prev);
@@ -142,15 +142,15 @@ int rankHospitalsByDistance(int source, const string& specialty, int resIdx[], i
         resIdx[count] = i; resDist[count] = dist[hospitals[i].atNode]; count++;
     }
     selectionSortByDistance(resIdx, resDist, count);
-    for (int i = 0; i < count; i++) resLen[i] = buildPath(prev, hospitals[resIdx[i]].atNode, resPath[i]);   // paths built after sorting
+    for (int i = 0; i < count; i++) resLen[i] = buildPath(prev, hospitals[resIdx[i]].atNode, resPath[i]);   
     return count;
 }
 
-// BFS: which hospitals can be reached from a node, and in how many road hops
+
 void printReachableHospitals(int src) {
     int parent[MAX_NODES], hop[MAX_NODES], order[MAX_NODES], oc = 0;
     bfsFrom(src, parent, hop, order, oc);
-    heading("Hospitals reachable (BFS) from " + nodeName(src));
+    heading("Hospitals reachable from " + nodeName(src));
     for (int i = 0; i < hospitalCount; i++)
         if (hop[hospitals[i].atNode] >= 0)
             cout << "  " << left << setw(8) << hospitals[i].code << setw(34) << hospitals[i].title << "hops=" << setw(3) << hop[hospitals[i].atNode] << "beds=" << hospitals[i].beds << "\n";

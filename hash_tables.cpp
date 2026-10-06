@@ -1,23 +1,23 @@
-// FILE: hash_tables.cpp | JOB: look up patients (by ID) and login accounts (by username) in O(1)
-// DSA: Hash table with separate chaining (array of buckets, each bucket = linked list)
+
+
 #pragma once
 #include "common.cpp"
 
-const int BUCKETS = 101;   // prime size = fewer collisions
+const int BUCKETS = 101;   
 
-// Hash function: polynomial rolling hash of the key string -> bucket number
+
 static int hashKey(const string& key) {
     unsigned long h = 0;
     for (size_t i = 0; i < key.size(); i++) h = h * 31 + (unsigned char)key[i];
     return (int)(h % BUCKETS);
 }
 
-// ================= PATIENTS (key = patient code) =================
+
 struct PatientCell { PatientRecord data; PatientCell* next; };
-static PatientCell* patientTable[BUCKETS];   // static arrays start as all NULL
+static PatientCell* patientTable[BUCKETS];   
 static int nextPatNo = 1;
 
-// insert at the head of the bucket's linked list
+
 static void patientInsert(const PatientRecord& r) {
     int slot = hashKey(r.code);
     patientTable[slot] = new PatientCell{r, patientTable[slot]};
@@ -29,7 +29,7 @@ string registerPatient(const string& name, const string& phone, int atNode) {
     return r.code;
 }
 
-// look up: hash the key, then walk only that one bucket
+
 PatientRecord* lookupPatient(const string& code) {
     for (PatientCell* p = patientTable[hashKey(code)]; p != NULL; p = p->next)
         if (p->data.code == code) return &p->data;
@@ -62,12 +62,12 @@ void loadPatients(const string& file) {
     }
 }
 
-// ================= LOGIN ACCOUNTS (key = username) =================
+
 struct AccountCell { UserAccount data; AccountCell* next; };
 static AccountCell* accountTable[BUCKETS];
 static UserAccount* loggedIn = NULL;
 
-// simple djb2 password hash so plain passwords are never saved (course project, not real security)
+
 static string hashPassword(const string& pw) {
     unsigned long h = 5381;
     for (size_t i = 0; i < pw.size(); i++) h = ((h << 5) + h) + (unsigned char)pw[i];
@@ -87,7 +87,7 @@ static void accountInsert(const UserAccount& a) {
 }
 
 bool registerAccount(const string& username, const string& password, int role, const string& patientCode) {
-    if (findAccountCell(username) != NULL) return false;      // username already used
+    if (findAccountCell(username) != NULL) return false;      
     UserAccount a = {username, hashPassword(password), role, patientCode};
     accountInsert(a);
     return true;
